@@ -668,8 +668,10 @@ class FPM::Package::Deb < FPM::Package
       # Strip leading /
       path = path[1..-1] if path[0,1] == "/"
       cfg_path = File.expand_path(path, staging_path)
-      Find.find(cfg_path).select { |p| File.file?(p) }.each do |p|
-        allconfigs << p.gsub("#{staging_path}/", '')
+      Find.find(cfg_path) do |p| 
+        if File.file?(p)
+          allconfigs << p.gsub("#{staging_path}/", '')
+        end
       end
     end
 
@@ -730,7 +732,7 @@ class FPM::Package::Deb < FPM::Package
   end # def write_debconf
 
   def write_meta_files
-    files = attributes[:deb_meta_files]
+    files = attributes[:deb_meta_file]
     return unless files
     files.each do |fn|
       dest = control_path(File.basename(fn))
